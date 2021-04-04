@@ -75,10 +75,10 @@ exports.addNeas = async (req, res) => {
     });
 
     //console.log(auxNea);
+    //añadimos cada nea en la nueva lista de neas
     newNeaList.push(auxNea);
 
   }
-
   //console.log(newNeaList);
 
   if (!Array.isArray(newNeaList)) {
@@ -109,7 +109,7 @@ exports.addNeas = async (req, res) => {
       });
 
       console.log('RESULT', dbResult);
-      
+
     } catch (error) {
       res.status(400).send({
         Ok: 0,
@@ -176,47 +176,102 @@ exports.getNea = async (req, res) => {
 exports.updateNea = async (req, res) => {
   const idNea = req.params.id;
   // eslint-disable-next-line object-curly-newline
-  const { a, b, e, i, om, w, ma } = req.body;
+  const { a, e, i, om, w, ma} = req.body;
   const fullName = req.body['full-name'];
 
-  const newNea = {};
+  const newDataNea = {};
 
-  if (fullName) newNea.full_name = fullName;
-  if (a) newNea.a = a;
-  if (b) newNea.b = b;
-  if (e) newNea.e = e;
-  if (i) newNea.i = i;
-  if (om) newNea.om = om;
-  if (w) newNea.w = w;
-  if (ma) newNea.ma = ma;
+  if (fullName) newDataNea.full_name = fullName;
+  if (a) newDataNea.a = a;
+  if (e) newDataNea.e = e;
+  if (i) newDataNea.i = i;
+  if (om) newDataNea.om = om;
+  if (w) newDataNea.w = w;
+  if (ma) newDataNea.ma = ma;
 
   const options = {
     new: true,
   };
 
-  try {
-    const result = await Nea.findOneAndUpdate({ idNea }, newNea, options);
-    if (result) {
-      res.status(200).send({
-        OK: 1,
-        status: 200,
-        message: `Nea ${idNea} actualizada`,
-        nea: result,
-      });
-    } else {
-      res.status(400).send({
-        OK: 0,
-        status: 400,
-        message: `No existe el Nea con esta ID: ${idNea}`,
+  //console.log(newDataNea);
+
+  const nea = await Nea.findOne({ idNea }, { _id: 0 });
+  //console.log(nea);
+  //variable que nos dira si calculamos o no
+  let calcular = false;
+  //si son iguales los datos no recalculamos
+  if (nea.a != newDataNea.a)
+  {
+    calcular = true;
+  }else if(nea.e != newDataNea.e)
+  {
+    calcular = true;
+  }else if(nea.i != newDataNea.i)
+  {
+    calcular = true;
+  }else if(nea.om != newDataNea.om)
+  {
+    calcular = true;
+  }else if(nea.w != newDataNea.w)
+  {
+    calcular = true;
+  }else if(nea.ma != newDataNea.ma)
+  {
+    calcular = true;
+  }else{
+    //console.log('No recalculamos');
+  }
+  
+  if(calcular == true)
+  { 
+    // si algún dato ha cambiado recalculamos
+    //console.log('Recalculamos long y lat');
+    // llamamos a la función de keplerjs para calcular la lat y long
+    const position = body2latlong(req.body);
+    //console.log(position);
+    // guardamos las variables
+    const latitude = position.lat;
+    const longitude = position.long;
+    const newNea = new Nea({
+      'idNea': idNea,
+      'full_name': newDataNea.full_name,
+      'a': newDataNea.a,
+      'e': newDataNea.e,
+      'i': newDataNea.i,
+      'om': newDataNea.om,
+      'w': newDataNea.w,
+      'ma': newDataNea.ma,
+      'latitude': latitude,
+      'longitude': longitude
+    });
+    //aquí puedes ver el nuevo objeto
+    console.log(newNea);
+
+    try { 
+      const result = await Nea.findOneAndUpdate({idNea}, newNea, options);
+      if (result) {
+        res.status(200).send({
+          OK: 1,
+          status: 200,
+          message: `Nea ${idNea} actualizada`,
+          nea: result,
+        });
+      } else {
+        res.status(400).send({
+          OK: 0,
+          status: 400,
+          message: `No existe el Nea con esta ID: ${idNea}`,
+        });
+      }
+    } catch (error) {
+      res.status(500).send({
+        Ok: 0,
+        status: 500,
+        message: `ERROR, no se ha podido obtener Nea: ${error}`,
       });
     }
-  } catch (error) {
-    res.status(500).send({
-      Ok: 0,
-      status: 500,
-      message: `ERROR, no se ha podido obtener Nea: ${error}`,
-    });
   }
+  
 };
 exports.deleteNea = async (req, res) => {
   const idNea = req.params.id;
