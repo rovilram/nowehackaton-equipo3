@@ -95,8 +95,8 @@ CREADA
 **age** Number, required
 **latitude** Number, required
 **longitude** Number, required
-**hotspot_asteroids** Number, required
-**price** Number, required
+**hotspot_asteroids** Number, required --> Calculado a partir de los valores de _latitude_ y _longitude_ de Client y Nea.
+**price** Number, required --> Valor calculado a partir del valor de _hotspot_asteroids_
 
 #### NEA
 
@@ -108,8 +108,8 @@ CREADA
 **om** Number, required
 **w** Number, required
 **ma** Number, required
-**latitude** Number, required
-**longitude** Number, required
+**latitude** Number, required --> Calculado a partir de los valores _a, e, i, om, w y ma_
+**longitude** Number, required --> Calculado a partir de los valores _a, e, i, om, w y ma_
 
 ### ENDPOINTS CRUD
 
@@ -176,6 +176,10 @@ Una vez autenticado, ya se puede hacer nuevos usuarios y transitar por el resto 
 Finalmente se puede "desactivar" el usuario en el endpoint _/logout_.
 
 Se puede ver un recorrido por la autenticación en [este video](https://github.com/rovilram/nowehackaton-equipo3/raw/main/recursos/JWTAuthDemo.webm)
+
+## IMPORTACIÓN DE CVS
+
+Se hacen dos funciones _jsonNeas2DB_ y _jsonClients2DB_ para importar los datos desde archivos CSV a las colecciones neas y clientes respectivamente.
 
 ## INSTALACIÓN
 
