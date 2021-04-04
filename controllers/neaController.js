@@ -318,6 +318,6 @@ exports.retrieveAsteroidsNearClient = async (lat, lon) => {
       { longitude: { $gte: lonMin } },
       { longitude: { $lte: lonMax } },
     ],
-  }).estimatedDocumentCount();
+  }).count();
   return result;
 };

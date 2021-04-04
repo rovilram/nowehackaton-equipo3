@@ -6,7 +6,10 @@ const { retrieveAsteroidsNearClient } = require('./neaController');
 exports.addClient = async (req, res) => {
   const idClient = nanoid();
   const { name, lastname, age, latitude, longitude, price } = req.body;
-
+  const hotspot_asteroids = await retrieveAsteroidsNearClient(
+    latitude,
+    longitude,
+  );
   const newClient = new Client({
     idClient,
     name,
@@ -14,8 +17,8 @@ exports.addClient = async (req, res) => {
     age,
     latitude,
     longitude,
-    hotspot_asteroids: 11, //computeHotspotAsteroids(latitude, longitude),
-    price: 2000, // TODO: Hacer función price...
+    hotspot_asteroids: hotspot_asteroids,
+    price: computePrice(age, hotspot_asteroids),
   });
   try {
     const result = await newClient.save();
@@ -47,7 +50,12 @@ exports.addClientList = async (req, res) => {
       rawResult: false,
     };
 
-    const clients = clientList.map((client) => {
+    const clients = clientList.map(async (client) => {
+      const hotspot_asteroids = await retrieveAsteroidsNearClient(
+        client.latitude,
+        client.longitude,
+      );
+      const price = computePrice(client.age, newClient.hotspot_asteroids);
       const newClient = {
         idClient: nanoid(),
         name: client.name,
@@ -55,11 +63,8 @@ exports.addClientList = async (req, res) => {
         age: client.age,
         latitude: client.latitude,
         longitude: client.longitude,
-        hotspot_asteroids: 11, //computeHotspotAsteroids(
-        //   client.latitude,
-        //   client.longitude,
-        // ),
-        price: client.price,
+        hotspot_asteroids: hotspot_asteroids,
+        price: price,
       };
       return newClient;
     });
@@ -149,6 +154,32 @@ exports.updateClient = async (req, res) => {
   if (latitude) newClient.latitude = latitude;
   if (longitude) newClient.longitude = longitude;
   if (price) newClient.price = price;
+
+  if (longitude || latitude || age) {
+    //tenemos que volver a calcular los campos computePrice y hotspot_asteroids
+    const result = await Client.findOne(
+      { idClient },
+      { latitude: 1, longitude: 1, age: 1 },
+    );
+    const newLat = latitude ? latitude : result.latitude;
+    const newLong = longitude ? longitude : result.longitude;
+    const newAge = age ? age : result.age;
+    console.log(
+      'ESTAMOS ACTUALIZANDO CLIENTE:',
+      result,
+      newLat,
+      newLong,
+      newAge,
+    );
+
+    newClient.hotspot_asteroids = await retrieveAsteroidsNearClient(
+      newLat,
+      newLong,
+    );
+    console.log(newClient.hotspot_asteroids);
+    newClient.price = computePrice(newAge, newClient.hotspot_asteroids);
+  }
+  console.log(newClient.price);
 
   const options = {
     new: true,
