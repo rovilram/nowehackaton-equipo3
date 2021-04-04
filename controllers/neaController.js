@@ -1,22 +1,22 @@
 const { nanoid } = require('nanoid');
 const Nea = require('../models/Nea');
 
-
 exports.addNea = async (req, res) => {
   const idNea = nanoid();
 
   // eslint-disable-next-line object-curly-newline
-  const { a, i, om, w, ma } = req.body;
+  const { a, i, e, om, w, ma } = req.body;
 
   const fullName = req.body['full-name'];
   const newNea = new Nea({
     idNea,
     'full-name': fullName,
     a,
+    e,
     i,
     om,
     w,
-    ma
+    ma,
   });
   try {
     const result = await newNea.save();
@@ -129,7 +129,7 @@ exports.getNea = async (req, res) => {
 exports.updateNea = async (req, res) => {
   const idNea = req.params.id;
   // eslint-disable-next-line object-curly-newline
-  const { a, b, i, om, w, ma } = req.body;
+  const { a, b, e, i, om, w, ma } = req.body;
   const fullName = req.body['full-name'];
 
   const newNea = {};
@@ -137,6 +137,7 @@ exports.updateNea = async (req, res) => {
   if (fullName) newNea.full_name = fullName;
   if (a) newNea.a = a;
   if (b) newNea.b = b;
+  if (e) newNea.e = e;
   if (i) newNea.i = i;
   if (om) newNea.om = om;
   if (w) newNea.w = w;
