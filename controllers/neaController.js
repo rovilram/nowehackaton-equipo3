@@ -177,7 +177,7 @@ exports.updateNea = async (req, res) => {
   const idNea = req.params.id;
   // eslint-disable-next-line object-curly-newline
   const { a, e, i, om, w, ma} = req.body;
-  const fullName = req.body['full-name'];
+  const fullName = req.body['full_name'];
 
   const newDataNea = {};
 
@@ -232,8 +232,7 @@ exports.updateNea = async (req, res) => {
     // guardamos las variables
     const latitude = position.lat;
     const longitude = position.long;
-    const newNea = new Nea({
-      'idNea': idNea,
+    const newNea = {
       'full_name': newDataNea.full_name,
       'a': newDataNea.a,
       'e': newDataNea.e,
@@ -243,7 +242,7 @@ exports.updateNea = async (req, res) => {
       'ma': newDataNea.ma,
       'latitude': latitude,
       'longitude': longitude
-    });
+    };
     //aquí puedes ver el nuevo objeto
     console.log(newNea);
 
