@@ -46,8 +46,10 @@ exports.addNea = async (req, res) => {
 };
 
 exports.addNeas = async (req, res) => {
+
   const neaList = req.body;
   console.log(neaList);
+  
   const newNeaList = [];
   // Recorremos la lista y generamos una nueva lista con los nuevos datos de los neas
   // eslint-disable-next-line no-restricted-syntax
