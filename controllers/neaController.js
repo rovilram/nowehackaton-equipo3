@@ -1,5 +1,8 @@
 const { nanoid } = require('nanoid');
 const Nea = require('../models/Nea');
+// añadimos la libreria de keplerjs
+const {body2latlong} = require("keplerjs");
+
 
 exports.addNea = async (req, res) => {
   const idNea = nanoid();
@@ -7,16 +10,25 @@ exports.addNea = async (req, res) => {
   // eslint-disable-next-line object-curly-newline
   const { a, i, e, om, w, ma } = req.body;
 
-  const fullName = req.body['full-name'];
+  // llamamos a la función de keplerjs para calcular la lat y long
+  const position = body2latlong(req.body);
+  console.log(position);
+  // guardamos las variables
+  const latitude = position.lat;
+  const longitude = position.long;
+
+  const fullName = req.body['full_name'];
   const newNea = new Nea({
     idNea,
-    'full-name': fullName,
+    'full_name': fullName,
     a,
     e,
     i,
     om,
     w,
     ma,
+    'latitude': latitude,
+    'longitude': longitude
   });
   try {
     const result = await newNea.save();
