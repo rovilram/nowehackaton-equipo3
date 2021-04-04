@@ -61,7 +61,6 @@ exports.addClientList = async (req, res) => {
         client.latitude,
         client.longitude,
       );
-      const price = computePrice(client.age, newClient.hotspot_asteroids);
       const newClient = {
         idClient: nanoid(),
         name: client.name,
@@ -70,12 +69,14 @@ exports.addClientList = async (req, res) => {
         latitude: client.latitude,
         longitude: client.longitude,
         hotspot_asteroids: hotspot_asteroids,
-        price: price,
+        price: computePrice(client.age, hotspot_asteroids),
       };
       return newClient;
     });
     try {
-      const dbResult = await Client.insertMany(clients, options);
+      promiseClients = await Promise.all(clients);
+      console.log(clients);
+      const dbResult = await Client.insertMany(promiseClients, options);
       res.status(200).send({
         Ok: 1,
         status: 200,
@@ -88,7 +89,7 @@ exports.addClientList = async (req, res) => {
       res.status(400).send({
         Ok: 0,
         status: 400,
-        message: 'ERROR, algunos documentos no se insertaron',
+        message: `ERROR, algunos documentos no se insertaron ${error}`,
         clientCreated: error.insertedDocs,
       });
     }
