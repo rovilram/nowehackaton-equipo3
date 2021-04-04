@@ -1,0 +1,35 @@
+{
+  "name": "nuwehackathon-individual",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seeds": "node ./seeds/createDB.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rovilram/nuwehackathon-individual.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rovilram/nuwehackathon-individual/issues"
+  },
+  "homepage": "https://github.com/rovilram/nuwehackathon-individual#readme",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csvtojson": "^2.0.10",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "md5": "^2.3.0",
+    "mongoose": "^5.12.3",
+    "nanoid": "^3.1.22"
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  }
+}
