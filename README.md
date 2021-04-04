@@ -1,7 +1,6 @@
 # HACK THAT STARTUP VOL.2 Reto Grupal
 
-Enunciado disponible en: [Enlace a pdf]
-(https://github.com/rovilram/nowehackaton-equipo3/blob/main/recursos/HTS2_Grupal_spanish.pdf)
+Enunciado disponible en: [Enlace a pdf](https://github.com/rovilram/nowehackaton-equipo3/blob/main/recursos/HTS2_Grupal_spanish.pdf)
 
 ## PARTICIPANTES
 
