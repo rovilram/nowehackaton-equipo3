@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const userRouter = require('./routes/userRouter');
 const neaRouter = require('./routes/neaRouter');
+const clientRouter = require('./routes/clientRouter');
 const { login, logout, authUser } = require('./controllers/userController');
 
 const server = express();
@@ -27,6 +28,8 @@ server.use('/user', userRouter);
 
 server.use('/user', authUser);
 server.use('/nea', neaRouter);
+
+server.use('/client', clientRouter);
 
 server.post('/login', login);
 
