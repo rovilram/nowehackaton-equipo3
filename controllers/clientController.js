@@ -223,7 +223,10 @@ exports.jsonClients2DB = (jsonObj) => {
     CSVClient.age = client.Age;
     CSVClient.latitude = client.Latitude;
     CSVClient.longitude = client.Longitude;
-    CSVClient.hotspot_asteroids = 11; //computeHotspotAsteroids(client.latitude, client.longitude),
+    CSVClient.hotspot_asteroids = retrieveAsteroidsNearClient(
+      client.Latitude,
+      client.Longitude,
+    );
     CSVClient.price = 100; //TODO: falta también esta función
     try {
       const newClient = new Client(CSVClient);
@@ -232,4 +235,24 @@ exports.jsonClients2DB = (jsonObj) => {
       console.error(`Error en importación CSV ${client.name}: ${error}`);
     }
   });
+};
+
+//MI TESTING
+const Nea = require('../models/Nea');
+
+const retrieveAsteroidsNearClient = async (lat, lon) => {
+  const latMin = lat - 15;
+  const latMax = lat + 15;
+  const lonMin = lon - 15;
+  const lonMax = lon + 15;
+
+  const result = await Nea.find({
+    $and: [
+      { latitude: { $gte: latMin } },
+      { latitude: { $lte: latMax } },
+      { longitude: { $gte: lonMin } },
+      { longitude: { $lte: lonMax } },
+    ],
+  }).count();
+  return result;
 };
