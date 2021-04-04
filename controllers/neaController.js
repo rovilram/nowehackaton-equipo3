@@ -1,8 +1,7 @@
 const { nanoid } = require('nanoid');
 const Nea = require('../models/Nea');
 // añadimos la libreria de keplerjs
-const {body2latlong} = require("keplerjs");
-
+const { body2latlong } = require('keplerjs');
 
 exports.addNea = async (req, res) => {
   const idNea = nanoid();
@@ -20,15 +19,15 @@ exports.addNea = async (req, res) => {
   const fullName = req.body['full_name'];
   const newNea = new Nea({
     idNea,
-    'full_name': fullName,
+    full_name: fullName,
     a,
     e,
     i,
     om,
     w,
     ma,
-    'latitude': latitude,
-    'longitude': longitude
+    latitude: latitude,
+    longitude: longitude,
   });
   try {
     const result = await newNea.save();
@@ -47,12 +46,12 @@ exports.addNea = async (req, res) => {
 };
 
 exports.addNeas = async (req, res) => {
-
   const neaList = req.body;
   console.log(neaList);
   const newNeaList = [];
-  //Recorremos la lista y generamos una nueva lista con los nuevos datos de los neas
-  for (const nea of neaList){
+  // Recorremos la lista y generamos una nueva lista con los nuevos datos de los neas
+  // eslint-disable-next-line no-restricted-syntax
+  for (const nea of neaList) {
     //console.log(nea);
     // para metros de cada nea
     const { a, i, e, om, w, ma } = nea;
@@ -61,23 +60,22 @@ exports.addNeas = async (req, res) => {
     // guardamos las variables
     const latitude = position.lat;
     const longitude = position.long;
-    const fullName = nea['full_name'];
+    const fullName = nea.full_name;
     const auxNea = new Nea({
-      'full_name': fullName,
+      full_name: fullName,
       a,
       e,
       i,
       om,
       w,
       ma,
-      'latitude': latitude,
-      'longitude': longitude
+      latitude: latitude,
+      longitude: longitude,
     });
 
     //console.log(auxNea);
     //añadimos cada nea en la nueva lista de neas
     newNeaList.push(auxNea);
-
   }
   //console.log(newNeaList);
 
@@ -109,7 +107,6 @@ exports.addNeas = async (req, res) => {
       });
 
       console.log('RESULT', dbResult);
-
     } catch (error) {
       res.status(400).send({
         Ok: 0,
@@ -200,30 +197,23 @@ exports.updateNea = async (req, res) => {
   //variable que nos dira si calculamos o no
   let calcular = false;
   //si son iguales los datos no recalculamos
-  if (nea.a != newDataNea.a)
-  {
+  if (nea.a != newDataNea.a) {
     calcular = true;
-  }else if(nea.e != newDataNea.e)
-  {
+  } else if (nea.e != newDataNea.e) {
     calcular = true;
-  }else if(nea.i != newDataNea.i)
-  {
+  } else if (nea.i != newDataNea.i) {
     calcular = true;
-  }else if(nea.om != newDataNea.om)
-  {
+  } else if (nea.om != newDataNea.om) {
     calcular = true;
-  }else if(nea.w != newDataNea.w)
-  {
+  } else if (nea.w != newDataNea.w) {
     calcular = true;
-  }else if(nea.ma != newDataNea.ma)
-  {
+  } else if (nea.ma != newDataNea.ma) {
     calcular = true;
-  }else{
+  } else {
     //console.log('No recalculamos');
   }
-  
-  if(calcular == true)
-  { 
+
+  if (calcular == true) {
     // si algún dato ha cambiado recalculamos
     //console.log('Recalculamos long y lat');
     // llamamos a la función de keplerjs para calcular la lat y long
@@ -246,8 +236,8 @@ exports.updateNea = async (req, res) => {
     //aquí puedes ver el nuevo objeto
     console.log(newNea);
 
-    try { 
-      const result = await Nea.findOneAndUpdate({idNea}, newNea, options);
+    try {
+      const result = await Nea.findOneAndUpdate({ idNea }, newNea, options);
       if (result) {
         res.status(200).send({
           OK: 1,
@@ -270,7 +260,6 @@ exports.updateNea = async (req, res) => {
       });
     }
   }
-  
 };
 exports.deleteNea = async (req, res) => {
   const idNea = req.params.id;
@@ -301,14 +290,18 @@ exports.deleteNea = async (req, res) => {
   }
 };
 
-exports.jsonArr2DB = async (jsonObj) => {
-  const neas = jsonObj.map((nea) => {
+exports.jsonNeas2DB = (jsonObj) => {
+  console.info('Importando archivo NEAS');
+  jsonObj.map(async (nea) => {
     nea.idNea = nanoid();
-    return nea;
+    const position = body2latlong(nea);
+    nea.latitude = position.lat;
+    nea.longitude = position.long;
+    try {
+      const newNea = new Nea(nea);
+      await newNea.save();
+    } catch (error) {
+      console.error(`Error en importación NEA ${nea.full_name} CSV: ${error}`);
+    }
   });
-  try {
-    await Nea.insertMany(neas);
-  } catch (error) {
-    console.log(`Error en importación CSV: ${error}`);
-  }
 };

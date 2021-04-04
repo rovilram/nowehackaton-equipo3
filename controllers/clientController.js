@@ -1,7 +1,5 @@
 /* eslint-disable camelcase */
 const { nanoid } = require('nanoid');
-const md5 = require('md5');
-const jwt = require('jsonwebtoken');
 const Client = require('../models/Client');
 
 exports.addClient = async (req, res) => {
@@ -16,7 +14,7 @@ exports.addClient = async (req, res) => {
     latitude,
     longitude,
     hotspot_asteroids: 11, //computeHotspotAsteroids(latitude, longitude),
-    price,
+    price: 2000, // TODO: Hacer función price...
   });
   try {
     const result = await newClient.save();
@@ -213,4 +211,25 @@ exports.deleteClient = async (req, res) => {
       message: `ERROR, no se ha podido encontrar cliente: ${error}`,
     });
   }
+};
+
+exports.jsonClients2DB = (jsonObj) => {
+  console.info('Importando archivo Clientes');
+  jsonObj.map(async (client) => {
+    const CSVClient = {};
+    CSVClient.idClient = nanoid();
+    CSVClient.name = client.Name;
+    CSVClient.lastname = client.Lastname;
+    CSVClient.age = client.Age;
+    CSVClient.latitude = client.Latitude;
+    CSVClient.longitude = client.Longitude;
+    CSVClient.hotspot_asteroids = 11; //computeHotspotAsteroids(client.latitude, client.longitude),
+    CSVClient.price = 100; //TODO: falta también esta función
+    try {
+      const newClient = new Client(CSVClient);
+      await newClient.save();
+    } catch (error) {
+      console.error(`Error en importación CSV ${client.name}: ${error}`);
+    }
+  });
 };
