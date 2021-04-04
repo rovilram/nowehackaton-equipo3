@@ -139,15 +139,15 @@ CREADA
 
 #### NEA
 
-**/nea/** _POST_ CREA nuevo Nea. Recibe un objeto del modelo Nea.
+**/nea** _POST_ CREA nuevo Nea. Recibe un objeto del modelo Nea.
 
-**/nea/** _GET_ DEVUELVE todos los Nea.
+**/nea** _GET_ DEVUELVE todos los Nea.
 
-**/nea/:id/** _GET_ DEVUELVE el Nea con idNea pasado en _req.params_.
+**/nea/:id** _GET_ DEVUELVE el Nea con idNea pasado en _req.params_.
 
-**/nea/:id/** _PATCH_ MODIFICA el Nea con idNea pasado en _req.params_. Recibe un objeto basado en el modelo Nea.
+**/nea/:id** _PATCH_ MODIFICA el Nea con idNea pasado en _req.params_. Recibe un objeto basado en el modelo Nea.
 
-**/nea/:id/** _DELETE_ BORRA el Nea con idNea pasado en _req.params_.
+**/nea/:id** _DELETE_ BORRA el Nea con idNea pasado en _req.params_.
 
 ### ENDPOINTS ADICIONALES
 
