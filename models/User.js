@@ -6,10 +6,33 @@ const userSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
-  userName: {
+  name: {
     type: String,
     required: true,
-    unique: true,
+  },
+  lastname: {
+    type: String,
+    required: true,
+  },
+  age: {
+    type: Number,
+    required: true,
+  },
+  latitude: {
+    type: Number,
+    required: true,
+  },
+  longitude: {
+    type: Number,
+    required: true,
+  },
+  hotspot_asteroids: {
+    type: Number,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
   },
   password: {
     type: String,

@@ -15,6 +15,10 @@ const neasSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  e: {
+    type: Number,
+    required: true,
+  },
   i: {
     type: Number,
     required: true,
@@ -28,6 +32,14 @@ const neasSchema = new mongoose.Schema({
     required: true,
   },
   ma: {
+    type: Number,
+    required: true,
+  },
+  latitude: {
+    type: Number,
+    required: true,
+  },
+  longitude: {
     type: Number,
     required: true,
   },
