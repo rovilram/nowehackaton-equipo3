@@ -3,6 +3,9 @@ const Nea = require('../models/Nea');
 // añadimos la libreria de keplerjs
 const { body2latlong } = require('keplerjs');
 
+//------------------------------------------------
+//ADD NEA ENDPOINT
+//------------------------------------------------
 exports.addNea = async (req, res) => {
   const idNea = nanoid();
 
@@ -45,6 +48,9 @@ exports.addNea = async (req, res) => {
   }
 };
 
+//------------------------------------------------
+//ADD NEAS ENDPOINT
+//------------------------------------------------
 exports.addNeas = async (req, res) => {
   const neaList = req.body;
   console.log(neaList);
@@ -117,6 +123,9 @@ exports.addNeas = async (req, res) => {
     }
   }
 };
+//------------------------------------------------
+//GET NEAS ENDPOINT
+//------------------------------------------------
 exports.getNeas = async (req, res) => {
   try {
     const result = await Nea.find({}, { _id: 0 });
@@ -144,6 +153,10 @@ exports.getNeas = async (req, res) => {
     });
   }
 };
+
+//------------------------------------------------
+//GET NEA ENDPOINT
+//------------------------------------------------
 exports.getNea = async (req, res) => {
   const idNea = req.params.id;
   try {
@@ -170,6 +183,10 @@ exports.getNea = async (req, res) => {
     });
   }
 };
+
+//------------------------------------------------
+//UPDATE NEA ENDPOINT
+//------------------------------------------------
 exports.updateNea = async (req, res) => {
   const idNea = req.params.id;
   // eslint-disable-next-line object-curly-newline
@@ -261,6 +278,10 @@ exports.updateNea = async (req, res) => {
     }
   }
 };
+
+//------------------------------------------------
+//DELETE NEA ENDPOINT
+//------------------------------------------------
 exports.deleteNea = async (req, res) => {
   const idNea = req.params.id;
   try {
@@ -290,11 +311,14 @@ exports.deleteNea = async (req, res) => {
   }
 };
 
+//------------------------------------------------
+//jsonNeas2DB: USADO EN IMPORTACIÓN DE CSV A LA BASE DE DATOS
+//------------------------------------------------
 exports.jsonNeas2DB = (jsonObj) => {
   console.info('Importando archivo NEAS');
   jsonObj.map(async (nea) => {
     nea.idNea = nanoid();
-    const position = body2latlong(nea);
+    const position = kepler(nea);
     nea.latitude = position.lat;
     nea.longitude = position.long;
     try {
@@ -305,6 +329,10 @@ exports.jsonNeas2DB = (jsonObj) => {
     }
   });
 };
+
+//------------------------------------------------
+//retrieveAsteroidsNearClient: Devuelve el número de asteroides cerca del cliente
+//------------------------------------------------
 exports.retrieveAsteroidsNearClient = async (lat, lon) => {
   const latMin = lat - 15;
   const latMax = lat + 15;
@@ -321,3 +349,29 @@ exports.retrieveAsteroidsNearClient = async (lat, lon) => {
   }).count();
   return result;
 };
+
+const kepler = (earth) => {
+  //Latitud E [-90,+90]   ;  Longitud E [-180, +180]
+  //La latitud ha de estar entre [-90, +90], si os da >+90 restarle 180, y si os da <-90 sumarle 180
+  //Buenas! Los valores de longitud deben estar entre [-180,180],si el paquete de kepler os long>180 tan solo le restais 180 , si long<-180 tan solo le sumais 180
+  const position = body2latlong(earth);
+  let { lat } = position;
+  let { long } = position;
+  if (lat < -90) lat += 180;
+  if (lat > 90) lat -= 180;
+  if (long < -180) long += 180;
+  if (long > 180) long -= 180;
+
+  return { lat, long };
+};
+
+const test = {
+  a: 1.747144358,
+  e: 0.456228789,
+  i: 1.866829785,
+  om: 209.8771827,
+  w: 114.6869595,
+  ma: 53.99792227,
+};
+
+console.log(kepler(test));

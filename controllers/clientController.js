@@ -5,7 +5,7 @@ const { retrieveAsteroidsNearClient } = require('./neaController');
 
 exports.addClient = async (req, res) => {
   const idClient = nanoid();
-  const { name, lastname, age, latitude, longitude, price } = req.body;
+  const { name, lastname, age, latitude, longitude } = req.body;
   const hotspot_asteroids = await retrieveAsteroidsNearClient(
     latitude,
     longitude,
