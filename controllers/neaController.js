@@ -1,11 +1,13 @@
 const { nanoid } = require('nanoid');
 const Nea = require('../models/Nea');
 
+
 exports.addNea = async (req, res) => {
   const idNea = nanoid();
 
   // eslint-disable-next-line object-curly-newline
   const { a, i, om, w, ma } = req.body;
+
   const fullName = req.body['full-name'];
   const newNea = new Nea({
     idNea,
@@ -14,7 +16,7 @@ exports.addNea = async (req, res) => {
     i,
     om,
     w,
-    ma,
+    ma
   });
   try {
     const result = await newNea.save();
