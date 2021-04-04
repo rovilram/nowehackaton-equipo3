@@ -1,14 +1,17 @@
 # HACK THAT STARTUP VOL.2 Reto Grupal
 
+Enunciado disponible en: [Enlace a pdf]
+(https://github.com/rovilram/nowehackaton-equipo3/blob/main/recursos/HTS2_Grupal_spanish.pdf)
+
 ## PARTICIPANTES
 
-\*[adrianoosses](https://github.com/adrianoosses)
+-[adrianoosses](https://github.com/adrianoosses)
 
-\*[dgelez86](https://github.com/dgelez86)
+-[dgelez86](https://github.com/dgelez86)
 
-\*[mawcoo](https://github.com/mawcoo)
+-[mawcoo](https://github.com/mawcoo)
 
-\*[rovilram](https://github.com/rovilram)
+-[rovilram](https://github.com/rovilram)
 
 ## BACKGROUND
 
@@ -164,11 +167,16 @@ CREADA
 ### MIDDLEWARE AUTORIZACIÓN
 
 middleware **authUser** que limita el paso a los endpoints del router _/user_, _client_, y _/neas_.
+
 No se puede hacer nada con ellos sin pasar un _token_ válido.
+
 Para autenticarse hay que entrar en ruta _/login_ con un usuario ya registrado.
+
 Una vez autenticado, ya se puede hacer nuevos usuarios y transitar por el resto de endpoints.
+
 Finalmente se puede "desactivar" el usuario en el endpoint _/logout_.
-Se puede ver un recorrido por la autenticación en el video:
+
+Se puede ver un recorrido por la autenticación en [este video](https://github.com/rovilram/nowehackaton-equipo3/blob/main/recursos/JWTAuthDemo.webm)
 
 ## INSTALACIÓN
 
@@ -177,4 +185,4 @@ Se puede ver un recorrido por la autenticación en el video:
 3. modificar si se quiere los valores predefinidos de servidor web y base de datos, en archivo `.env`, incluido en el repositorio para facilitar instalación.
 4. Ejecutar script para recostituir la base de datos a partir de CSV de NEAS y clientes y un json con usuarios predeterminados: `npm run seeds`.
 5. lanzar con node el fichero js principal: `node main.js`.
-6. probar funcionamiento con postman. Se puede importar en postman el siguiente archivo:
+6. probar funcionamiento con postman. Se puede importar en postman [este archivo](https://github.com/rovilram/nowehackaton-equipo3/blob/main/recursos/Insurance.postman_collection.json)
