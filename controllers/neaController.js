@@ -12,7 +12,7 @@ exports.addNea = async (req, res) => {
 
   // llamamos a la función de keplerjs para calcular la lat y long
   const position = body2latlong(req.body);
-  console.log(position);
+  //console.log(position);
   // guardamos las variables
   const latitude = position.lat;
   const longitude = position.long;
@@ -47,7 +47,39 @@ exports.addNea = async (req, res) => {
 };
 
 exports.addNeas = async (req, res) => {
+
   const neaList = req.body;
+  console.log(neaList);
+  const newNeaList = [];
+  //Recorremos la lista y generamos una nueva lista con los nuevos datos de los neas
+  for (const nea of neaList){
+    //console.log(nea);
+    // para metros de cada nea
+    const { a, i, e, om, w, ma } = nea;
+    // calculamos la posición de cada nea
+    const position = body2latlong(nea);
+    // guardamos las variables
+    const latitude = position.lat;
+    const longitude = position.long;
+    const fullName = nea['full_name'];
+    const auxNea = new Nea({
+      'full_name': fullName,
+      a,
+      e,
+      i,
+      om,
+      w,
+      ma,
+      'latitude': latitude,
+      'longitude': longitude
+    });
+
+    //console.log(auxNea);
+    newNeaList.push(auxNea);
+
+  }
+
+  console.log(newNeaList);
   if (!Array.isArray(neaList)) {
     res.status(400).send({
       Ok: 0,
@@ -60,11 +92,12 @@ exports.addNeas = async (req, res) => {
       rawResult: false,
     };
 
-    const neas = neaList.map((nea) => {
+    const neas = newNeaList.map((nea) => {
       // eslint-disable-next-line no-param-reassign
       nea.idNea = nanoid();
       return nea;
     });
+
     try {
       const dbResult = await Nea.insertMany(neas, options);
       res.status(200).send({
