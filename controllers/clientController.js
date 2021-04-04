@@ -1,11 +1,18 @@
 /* eslint-disable camelcase */
 const { nanoid } = require('nanoid');
 const Client = require('../models/Client');
+const { retrieveAsteroidsNearClient } = require('./neaController');
 
+//------------------------------------------------
+// ADD CLIENT ENDPOINT
+//------------------------------------------------
 exports.addClient = async (req, res) => {
   const idClient = nanoid();
-  const { name, lastname, age, latitude, longitude, price } = req.body;
-
+  const { name, lastname, age, latitude, longitude } = req.body;
+  const hotspot_asteroids = await retrieveAsteroidsNearClient(
+    latitude,
+    longitude,
+  );
   const newClient = new Client({
     idClient,
     name,
@@ -13,25 +20,28 @@ exports.addClient = async (req, res) => {
     age,
     latitude,
     longitude,
-    hotspot_asteroids: 11, //computeHotspotAsteroids(latitude, longitude),
-    price: 2000, // TODO: Hacer función price...
+    hotspot_asteroids: hotspot_asteroids,
+    price: computePrice(age, hotspot_asteroids),
   });
   try {
     const result = await newClient.save();
     res.status(200).send({
       OK: 1,
-      message: 'usuario añadido',
+      message: 'Cliente añadido',
       idClient: result.idClient,
     });
   } catch (error) {
     res.status(400).send({
       Ok: 0,
       status: 400,
-      message: `ERROR, usuario NO añadido:, ${error}`,
+      message: `ERROR, cliente NO añadido:, ${error}`,
     });
   }
 };
 
+//------------------------------------------------
+// ADD ClientS ENDPOINT
+//------------------------------------------------
 exports.addClientList = async (req, res) => {
   const clientList = req.body;
   if (!Array.isArray(clientList)) {
@@ -46,7 +56,11 @@ exports.addClientList = async (req, res) => {
       rawResult: false,
     };
 
-    const clients = clientList.map((client) => {
+    const clients = clientList.map(async (client) => {
+      const hotspot_asteroids = await retrieveAsteroidsNearClient(
+        client.latitude,
+        client.longitude,
+      );
       const newClient = {
         idClient: nanoid(),
         name: client.name,
@@ -54,16 +68,15 @@ exports.addClientList = async (req, res) => {
         age: client.age,
         latitude: client.latitude,
         longitude: client.longitude,
-        hotspot_asteroids: 11, //computeHotspotAsteroids(
-        //   client.latitude,
-        //   client.longitude,
-        // ),
-        price: client.price,
+        hotspot_asteroids: hotspot_asteroids,
+        price: computePrice(client.age, hotspot_asteroids),
       };
       return newClient;
     });
     try {
-      const dbResult = await Client.insertMany(clients, options);
+      promiseClients = await Promise.all(clients);
+      console.log(clients);
+      const dbResult = await Client.insertMany(promiseClients, options);
       res.status(200).send({
         Ok: 1,
         status: 200,
@@ -76,13 +89,16 @@ exports.addClientList = async (req, res) => {
       res.status(400).send({
         Ok: 0,
         status: 400,
-        message: 'ERROR, algunos documentos no se insertaron',
+        message: `ERROR, algunos documentos no se insertaron ${error}`,
         clientCreated: error.insertedDocs,
       });
     }
   }
 };
 
+//------------------------------------------------
+// GET CLIENT ENDPOINT
+//------------------------------------------------
 exports.getClient = async (req, res) => {
   const idClient = req.params.id;
   try {
@@ -91,25 +107,28 @@ exports.getClient = async (req, res) => {
       res.status(200).send({
         OK: 1,
         status: 200,
-        message: `usuario ${idClient} obtenido`,
+        message: `cliente ${idClient} obtenido`,
         client: result,
       });
     } else {
       res.status(400).send({
         OK: 0,
         status: 400,
-        message: `No existe el usuario con esta ID: ${idClient}`,
+        message: `No existe el cliente con esta ID: ${idClient}`,
       });
     }
   } catch (error) {
     res.status(500).send({
       Ok: 0,
       status: 500,
-      message: `ERROR, no se ha podido obtener usuario: ${error}`,
+      message: `ERROR, no se ha podido obtener cliente: ${error}`,
     });
   }
 };
 
+//------------------------------------------------
+// GET ClientS ENDPOINT
+//------------------------------------------------
 exports.getClients = async (req, res) => {
   try {
     const result = await Client.find({}, { _id: 0, password: 0 });
@@ -118,14 +137,14 @@ exports.getClients = async (req, res) => {
         res.status(200).send({
           OK: 1,
           status: 200,
-          message: 'todos los usuarios obtenidos',
+          message: 'todos los clientes obtenidos',
           client: result,
         });
       } else {
         res.status(400).send({
           OK: 0,
           status: 400,
-          message: 'No hay usuarios en la base de datos',
+          message: 'No hay clientes en la base de datos',
         });
       }
     }
@@ -133,11 +152,14 @@ exports.getClients = async (req, res) => {
     res.status(500).send({
       Ok: 0,
       status: 500,
-      message: `ERROR, no se han podido obtener usuarios: ${error}`,
+      message: `ERROR, no se han podido obtener clientes: ${error}`,
     });
   }
 };
 
+//------------------------------------------------
+// UPDATE CLIENT ENDPOINT
+//------------------------------------------------
 exports.updateClient = async (req, res) => {
   const newClient = {};
   const idClient = req.params.id;
@@ -148,6 +170,32 @@ exports.updateClient = async (req, res) => {
   if (latitude) newClient.latitude = latitude;
   if (longitude) newClient.longitude = longitude;
   if (price) newClient.price = price;
+
+  if (longitude || latitude || age) {
+    //tenemos que volver a calcular los campos computePrice y hotspot_asteroids
+    const result = await Client.findOne(
+      { idClient },
+      { latitude: 1, longitude: 1, age: 1 },
+    );
+    const newLat = latitude ? latitude : result.latitude;
+    const newLong = longitude ? longitude : result.longitude;
+    const newAge = age ? age : result.age;
+    console.log(
+      'ESTAMOS ACTUALIZANDO CLIENTE:',
+      result,
+      newLat,
+      newLong,
+      newAge,
+    );
+
+    newClient.hotspot_asteroids = await retrieveAsteroidsNearClient(
+      newLat,
+      newLong,
+    );
+    console.log(newClient.hotspot_asteroids);
+    newClient.price = computePrice(newAge, newClient.hotspot_asteroids);
+  }
+  console.log(newClient.price);
 
   const options = {
     new: true,
@@ -182,6 +230,9 @@ exports.updateClient = async (req, res) => {
   }
 };
 
+//------------------------------------------------
+// DELETE CLIENT ENDPOINT
+//------------------------------------------------
 exports.deleteClient = async (req, res) => {
   const idClient = req.params.id;
   try {
@@ -213,6 +264,9 @@ exports.deleteClient = async (req, res) => {
   }
 };
 
+//------------------------------------------------
+// jsonClients2DB: USADO EN IMPORTACIÓN DE CSV A LA BASE DE DATOS
+//------------------------------------------------
 exports.jsonClients2DB = (jsonObj) => {
   console.info('Importando archivo Clientes');
   jsonObj.map(async (client) => {
@@ -223,8 +277,11 @@ exports.jsonClients2DB = (jsonObj) => {
     CSVClient.age = client.Age;
     CSVClient.latitude = client.Latitude;
     CSVClient.longitude = client.Longitude;
-    CSVClient.hotspot_asteroids = 11; //computeHotspotAsteroids(client.latitude, client.longitude),
-    CSVClient.price = 100; //TODO: falta también esta función
+    CSVClient.hotspot_asteroids = await retrieveAsteroidsNearClient(
+      client.Latitude,
+      client.Longitude,
+    );
+    CSVClient.price = computePrice(client.Age, CSVClient.hotspot_asteroids);
     try {
       const newClient = new Client(CSVClient);
       await newClient.save();
@@ -232,4 +289,14 @@ exports.jsonClients2DB = (jsonObj) => {
       console.error(`Error en importación CSV ${client.name}: ${error}`);
     }
   });
+};
+
+//------------------------------------------------
+// computePrice: Devuelve el precio del seguro del cliente
+//------------------------------------------------
+const computePrice = (age, hotspotAsteroids) => {
+  const fixedPrice = 170;
+  const variablePrice = (100 * age) / 35 + 10 * hotspotAsteroids;
+
+  return fixedPrice + variablePrice;
 };
