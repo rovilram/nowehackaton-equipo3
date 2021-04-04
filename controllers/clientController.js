@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 const { nanoid } = require('nanoid');
 const Client = require('../models/Client');
+const { retrieveAsteroidsNearClient } = require('./neaController');
 
 exports.addClient = async (req, res) => {
   const idClient = nanoid();
@@ -223,11 +224,11 @@ exports.jsonClients2DB = (jsonObj) => {
     CSVClient.age = client.Age;
     CSVClient.latitude = client.Latitude;
     CSVClient.longitude = client.Longitude;
-    CSVClient.hotspot_asteroids = retrieveAsteroidsNearClient(
+    CSVClient.hotspot_asteroids = await retrieveAsteroidsNearClient(
       client.Latitude,
       client.Longitude,
     );
-    CSVClient.price = 100; //TODO: falta también esta función
+    CSVClient.price = computePrice(client.Age, CSVClient.hotspot_asteroids);
     try {
       const newClient = new Client(CSVClient);
       await newClient.save();
@@ -237,22 +238,9 @@ exports.jsonClients2DB = (jsonObj) => {
   });
 };
 
-//MI TESTING
-const Nea = require('../models/Nea');
+const computePrice = (age, hotspotAsteroids) => {
+  const fixedPrice = 170;
+  const variablePrice = (100 * age) / 35 + 10 * hotspotAsteroids;
 
-const retrieveAsteroidsNearClient = async (lat, lon) => {
-  const latMin = lat - 15;
-  const latMax = lat + 15;
-  const lonMin = lon - 15;
-  const lonMax = lon + 15;
-
-  const result = await Nea.find({
-    $and: [
-      { latitude: { $gte: latMin } },
-      { latitude: { $lte: latMax } },
-      { longitude: { $gte: lonMin } },
-      { longitude: { $lte: lonMax } },
-    ],
-  }).count();
-  return result;
+  return fixedPrice + variablePrice;
 };

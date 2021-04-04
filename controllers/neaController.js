@@ -173,7 +173,7 @@ exports.getNea = async (req, res) => {
 exports.updateNea = async (req, res) => {
   const idNea = req.params.id;
   // eslint-disable-next-line object-curly-newline
-  const { a, e, i, om, w, ma} = req.body;
+  const { a, e, i, om, w, ma } = req.body;
   const fullName = req.body['full_name'];
 
   const newDataNea = {};
@@ -223,15 +223,15 @@ exports.updateNea = async (req, res) => {
     const latitude = position.lat;
     const longitude = position.long;
     const newNea = {
-      'full_name': newDataNea.full_name,
-      'a': newDataNea.a,
-      'e': newDataNea.e,
-      'i': newDataNea.i,
-      'om': newDataNea.om,
-      'w': newDataNea.w,
-      'ma': newDataNea.ma,
-      'latitude': latitude,
-      'longitude': longitude
+      full_name: newDataNea.full_name,
+      a: newDataNea.a,
+      e: newDataNea.e,
+      i: newDataNea.i,
+      om: newDataNea.om,
+      w: newDataNea.w,
+      ma: newDataNea.ma,
+      latitude: latitude,
+      longitude: longitude,
     };
     //aquí puedes ver el nuevo objeto
     console.log(newNea);
@@ -304,4 +304,20 @@ exports.jsonNeas2DB = (jsonObj) => {
       console.error(`Error en importación NEA ${nea.full_name} CSV: ${error}`);
     }
   });
+};
+exports.retrieveAsteroidsNearClient = async (lat, lon) => {
+  const latMin = lat - 15;
+  const latMax = lat + 15;
+  const lonMin = lon - 15;
+  const lonMax = lon + 15;
+
+  const result = await Nea.find({
+    $and: [
+      { latitude: { $gte: latMin } },
+      { latitude: { $lte: latMax } },
+      { longitude: { $gte: lonMin } },
+      { longitude: { $lte: lonMax } },
+    ],
+  }).estimatedDocumentCount();
+  return result;
 };
