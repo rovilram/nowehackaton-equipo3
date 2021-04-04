@@ -175,7 +175,7 @@ Una vez autenticado, ya se puede hacer nuevos usuarios y transitar por el resto 
 
 Finalmente se puede "desactivar" el usuario en el endpoint _/logout_.
 
-Se puede ver un recorrido por la autenticación en [este video](https://github.com/rovilram/nowehackaton-equipo3/blob/main/recursos/JWTAuthDemo.webm)
+Se puede ver un recorrido por la autenticación en [este video](https://github.com/rovilram/nowehackaton-equipo3/raw/main/recursos/JWTAuthDemo.webm)
 
 ## INSTALACIÓN
 
