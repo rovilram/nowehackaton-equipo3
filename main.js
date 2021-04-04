@@ -23,12 +23,13 @@ server.get('/', (req, res) => {
   res.send("Hello World! I'm a API server");
 });
 
-//server.use('/user', authUser);
+server.use('/user', authUser);
 server.use('/user', userRouter);
 
-//server.use('/user', authUser);
+server.use('/nea', authUser);
 server.use('/nea', neaRouter);
 
+server.use('/client', authUser);
 server.use('/client', clientRouter);
 
 server.post('/login', login);
