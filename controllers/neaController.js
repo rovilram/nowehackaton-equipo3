@@ -79,8 +79,9 @@ exports.addNeas = async (req, res) => {
 
   }
 
-  console.log(newNeaList);
-  if (!Array.isArray(neaList)) {
+  //console.log(newNeaList);
+
+  if (!Array.isArray(newNeaList)) {
     res.status(400).send({
       Ok: 0,
       status: 400,
@@ -108,6 +109,7 @@ exports.addNeas = async (req, res) => {
       });
 
       console.log('RESULT', dbResult);
+      
     } catch (error) {
       res.status(400).send({
         Ok: 0,
